@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Codefleet</title>
+</head>
+</head>
+<body>
+    <h1>What would you like to build?</h1>
+    <div class="container">
+        <form class="search-bar">
+        <input type="text" placeholder="Your text here ..." id="user-input" />
+        <button type="button" id="submit-button">Submit</button>
+        </form>
+    </div>
+    <div class="chat-container" id="chat-container">
+        <!-- ChatGPT conversation will be displayed here -->
+    </div>
+    <script>
+        // Function to fetch the API key from the server
+        async function fetchApiKey() {
+            const response = await fetch('http://localhost:3000/api-key');
+            const data = await response.json();
+            return data.apiKey;
+        }
+
+        // Function to initialize the OpenAI API client with the fetched API key
+        async function initializeOpenAI() {
+            const apiKey = await fetchApiKey();
+            const openai = new OpenAI(apiKey);
+            return openai;
+        }
+
+        // Function to send a message to the ChatGPT agent and display the response
+        async function sendMessage(message, openai) {
+            const response = await openai.complete({
+                engine: 'davinci', // Or any other engine you prefer
+                prompt: message,
+                maxTokens: 150
+            });
+            displayMessage(response.data.choices[0].text.trim());
+        }
+
+        // Function to display a message in the chat container
+        function displayMessage(message) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            chatContainer.appendChild(messageElement);
+        }
+
+        // Example: Initialize the OpenAI API client and send a message when the page loads
+        initializeOpenAI()
+            .then(openai => sendMessage("Hello, ChatGPT!", openai))
+            .catch(err => console.error('Error initializing OpenAI:', err));
+    </script>
+  
+
+<style>
+  /* Your existing styles */
+  .chat-container {
+    margin-top: 20px;
+    max-width: 300px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .message {
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 6px;
+  }
+  .user {
+    background-color: #f1f1f1;
+    text-align: right;
+  }
+  .assistant {
+    background-color: #e1e1e1;
+  }
+</body>
+</html>
