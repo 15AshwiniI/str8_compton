@@ -15,43 +15,25 @@
     <div class="chat-container" id="chat-container">
         <!-- ChatGPT conversation will be displayed here -->
     </div>
+
     <script>
-        // Function to fetch the API key from the server
-        async function fetchApiKey() {
-            const response = await fetch('http://localhost:3000/api-key');
+        async function fetchAnswer(parameter) {
+            console.log(parameter);
+            const response = await fetch('http://localhost:8000/completion');
             const data = await response.json();
-            return data.apiKey;
+            return data;
         }
 
-        // Function to initialize the OpenAI API client with the fetched API key
-        async function initializeOpenAI() {
-            const apiKey = await fetchApiKey();
-            const openai = new OpenAI(apiKey);
-            return openai;
-        }
-
-        // Function to send a message to the ChatGPT agent and display the response
-        async function sendMessage(message, openai) {
-            const response = await openai.complete({
-                engine: 'davinci', // Or any other engine you prefer
-                prompt: message,
-                maxTokens: 150
-            });
-            displayMessage(response.data.choices[0].text.trim());
-        }
-
-        // Function to display a message in the chat container
-        function displayMessage(message) {
+        // Function to update the chat container with the returned text
+        async function updateChatContainer() {
+            const apiKey = await fetchAnswer();
+            const text = 'Text returned by the server'; // Replace this with the text returned by the server
             const chatContainer = document.getElementById('chat-container');
-            const messageElement = document.createElement('div');
-            messageElement.textContent = message;
-            chatContainer.appendChild(messageElement);
+            chatContainer.innerHTML = `<div class="message assistant">${text}</div>`;
         }
 
-        // Example: Initialize the OpenAI API client and send a message when the page loads
-        initializeOpenAI()
-            .then(openai => sendMessage("Hello, ChatGPT!", openai))
-            .catch(err => console.error('Error initializing OpenAI:', err));
+        // Call the function to update the chat container when the page loads
+        window.onload = updateChatContainer;
     </script>
   
 
@@ -77,5 +59,6 @@
   .assistant {
     background-color: #e1e1e1;
   }
+</style>
 </body>
 </html>
